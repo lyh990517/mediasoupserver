@@ -59,16 +59,23 @@ io.on('connection', (socket) => {
     socket.on('createWebRtcTransport', async (callback) => {
       try {
         const transport = await router.createWebRtcTransport({
-          listenIps: ['127.0.0.1'],
+          listenIps: [{ ip: '127.0.0.1', announcedIp: null }], // 서버 IP 설정
           enableUdp: true,
           enableTcp: true,
           preferUdp: true,
         });
-  
+    
+        console.log('Transport created:', transport.id); // 디버그용 로그 추가
+    
         if (callback && typeof callback === 'function') {
-          callback({ transportOptions: transport.options });
-        } else {
-          console.error('No callback function provided by the client.');
+          callback({
+            transportOptions: {
+              id: transport.id,
+              iceParameters: transport.iceParameters,
+              iceCandidates: transport.iceCandidates,
+              dtlsParameters: transport.dtlsParameters,
+            },
+          });
         }
       } catch (error) {
         console.error('Error creating WebRtcTransport:', error);
@@ -77,6 +84,7 @@ io.on('connection', (socket) => {
         }
       }
     });
+    
   
     socket.on('disconnect', () => {
       console.log('Client disconnected');
