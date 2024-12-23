@@ -38,6 +38,10 @@ const startServer = async () => {
   console.log('Mediasoup server started');
 };
 
+app.get('/', (req, res) => {
+    res.send('Mediasoup Server is Running');
+  });  
+
 startServer();
 
 io.on('connection', (socket) => {
