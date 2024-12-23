@@ -58,6 +58,7 @@ io.on('connection', (socket) => {
     
     socket.on('createWebRtcTransport', async (callback) => {
       try {
+        // WebRtcTransport 생성
         const transport = await router.createWebRtcTransport({
           listenIps: [{ ip: '127.0.0.1', announcedIp: null }], // 서버 IP 설정
           enableUdp: true,
@@ -65,17 +66,19 @@ io.on('connection', (socket) => {
           preferUdp: true,
         });
     
-        console.log('Transport created:', transport.id); // 디버그용 로그 추가
-    
+        console.log('rtpCapabilities:', router.rtpCapabilities); // 디버그용 로그 추가
+
+        // routerRtpCapabilities를 transportOptions에 추가
+        const transportOptions = {
+          id: transport.id,
+          iceParameters: transport.iceParameters,
+          iceCandidates: transport.iceCandidates,
+          dtlsParameters: transport.dtlsParameters,
+          routerRtpCapabilities: router.rtpCapabilities, // RTP 기능을 추가
+        };
+
         if (callback && typeof callback === 'function') {
-          callback({
-            transportOptions: {
-              id: transport.id,
-              iceParameters: transport.iceParameters,
-              iceCandidates: transport.iceCandidates,
-              dtlsParameters: transport.dtlsParameters,
-            },
-          });
+          callback({ transportOptions });
         }
       } catch (error) {
         console.error('Error creating WebRtcTransport:', error);
@@ -84,13 +87,11 @@ io.on('connection', (socket) => {
         }
       }
     });
-    
-  
+
     socket.on('disconnect', () => {
       console.log('Client disconnected');
     });
-  });
-  
+});
 
 server.listen(3000, () => {
   console.log('Server is listening on port 3000');
