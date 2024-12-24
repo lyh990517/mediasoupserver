@@ -56,14 +56,18 @@ startServer();
 io.on('connection', (socket) => {
     console.log('Client connected');
     
-    socket.on('createWebRtcTransport', async (callback) => {
+    socket.on('createWebRtcTransport', async (optionsJson ,callback) => {
       try {
         // WebRtcTransport 생성
+        const options = JSON.parse(optionsJson)
+
+        console.log('options:', options);
+        
         const transport = await router.createWebRtcTransport({
           listenIps: [{ ip: '127.0.0.1', announcedIp: null }], // 서버 IP 설정
-          enableUdp: true,
-          enableTcp: true,
-          preferUdp: true,
+          enableUdp: options.enableUdp,
+          enableTcp: options.enableTcp,
+          preferUdp: options.preferUdp,
         });
     
         console.log('id:', transport.id); // 디버그용 로그 추가
