@@ -68,12 +68,14 @@ io.on('connection', (socket) => {
           enableUdp: options.enableUdp,
           enableTcp: options.enableTcp,
           preferUdp: options.preferUdp,
+          sctpCapabilities: options.sctpCapabilities,
         });
     
         console.log('id:', transport.id); // 디버그용 로그 추가
         console.log('iceParameters:', transport.iceParameters); // 디버그용 로그 추가
         console.log('iceCandidates:', transport.iceCandidates); // 디버그용 로그 추가
         console.log('dtlsParameters:', transport.dtlsParameters); // 디버그용 로그 추가
+        console.log('sctpParameters:', transport.sctpParameters); // 디버그용 로그 추가
 
         // routerRtpCapabilities를 transportOptions에 추가
         const transportOptions = {
@@ -81,6 +83,7 @@ io.on('connection', (socket) => {
           iceParameters: transport.iceParameters,
           iceCandidates: transport.iceCandidates,
           dtlsParameters: transport.dtlsParameters,
+          sctpParameters: transport.sctpParameters,
         };
 
         if (callback && typeof callback === 'function') {
