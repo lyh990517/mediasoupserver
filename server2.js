@@ -66,7 +66,10 @@ io.on('connection', (socket) => {
           preferUdp: true,
         });
     
-        console.log('rtpCapabilities:', router.rtpCapabilities); // 디버그용 로그 추가
+        console.log('id:', transport.id); // 디버그용 로그 추가
+        console.log('iceParameters:', transport.iceParameters); // 디버그용 로그 추가
+        console.log('iceCandidates:', transport.iceCandidates); // 디버그용 로그 추가
+        console.log('dtlsParameters:', transport.dtlsParameters); // 디버그용 로그 추가
 
         // routerRtpCapabilities를 transportOptions에 추가
         const transportOptions = {
@@ -74,7 +77,6 @@ io.on('connection', (socket) => {
           iceParameters: transport.iceParameters,
           iceCandidates: transport.iceCandidates,
           dtlsParameters: transport.dtlsParameters,
-          routerRtpCapabilities: router.rtpCapabilities, // RTP 기능을 추가
         };
 
         if (callback && typeof callback === 'function') {
@@ -85,6 +87,18 @@ io.on('connection', (socket) => {
         if (callback && typeof callback === 'function') {
           callback({ error: 'Failed to create WebRtcTransport' });
         }
+      }
+    });
+
+    socket.on('getRouterCapabilities', (callback) => {
+      if (router) {
+        callback({
+          routerRtpCapabilities: router.rtpCapabilities,
+        });
+      } else {
+        callback({
+          error: 'Router not initialized',
+        });
       }
     });
 
