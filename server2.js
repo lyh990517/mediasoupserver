@@ -67,8 +67,9 @@ io.on('connection', (socket) => {
           listenIps: [{ ip: '127.0.0.1', announcedIp: null }], // 서버 IP 설정
           enableUdp: options.enableUdp,
           enableTcp: options.enableTcp,
+          enableSctp: true,
           preferUdp: options.preferUdp,
-          sctpCapabilities: options.sctpCapabilities,
+          sctpParameters: options.sctpCapabilities,
         });
     
         console.log('id:', transport.id); // 디버그용 로그 추가
