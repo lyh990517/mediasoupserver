@@ -111,6 +111,36 @@ io.on('connection', (socket) => {
       }
     });
 
+    socket.on('consume', async (data, callback) => {
+      try {
+          const json = JSON.parse(data);
+          console.log('producerId:', json.producerId);  // 디버깅 로그
+
+          const rtpCapabilities = typeof json.rtpCapabilities === 'string'
+            ? JSON.parse(json.rtpCapabilities)
+            : json.rtpCapabilities;
+
+            console.log('rtpCapabilities:', rtpCapabilities);  // 디버깅 로그
+
+          if (!transport) {
+              throw new Error('Transport not found');
+          }
+  
+          const consumer = await transport.consume({ 
+            producerId: json.producerId,
+            rtpCapabilities: rtpCapabilities
+          })
+  
+          console.log(`Consumer created with ID: ${consumer.id}`);
+  
+          callback({ consumerId: consumer.id });
+  
+      } catch (error) {
+          console.error('Error in consume:', error);
+          callback({ error: 'Failed to consume' });
+      }
+  });
+
     socket.on('produce', async (data, callback) => {
       try {
           const json = JSON.parse(data)
