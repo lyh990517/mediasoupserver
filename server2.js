@@ -15,6 +15,7 @@ const io = socketIo(server, {
 
 let worker;
 let router;
+let transport;
 
 const startServer = async () => {
   // Mediasoup 워커 생성
@@ -63,7 +64,7 @@ io.on('connection', (socket) => {
 
         console.log('options:', options);
         
-        const transport = await router.createWebRtcTransport({
+        transport = await router.createWebRtcTransport({
           listenIps: [{ ip: '127.0.0.1', announcedIp: null }], // 서버 IP 설정
           enableUdp: options.enableUdp,
           enableTcp: options.enableTcp,
@@ -109,6 +110,42 @@ io.on('connection', (socket) => {
         });
       }
     });
+
+    socket.on('produce', async (data, callback) => {
+      try {
+          const json = JSON.parse(data)
+  
+          console.log('transportId:', json.transportId); // 디버그용 로그 추가
+          console.log('kind:', json.kind); // 디버그용 로그 추가
+          console.log('rtpParameters:', json.rtpParameters); // 디버그용 로그 추가
+          console.log('appData:', json.appData); // 디버그용 로그 추가
+
+          const rtpParametersObject = JSON.parse(json.rtpParameters);
+          const appDataObject = JSON.parse(json.appData)
+
+          const appData = json.appData && typeof json.appData === 'object' ? json.appData : {};
+
+          if (!transport) {
+              throw new Error('Transport not found');
+          }
+  
+          const producer = await transport.produce({
+              kind: json.kind,
+              rtpParameters: rtpParametersObject,
+              appData: appDataObject,
+          });
+  
+          const producerId = producer.id;
+  
+          console.log(`Producer created with ID: ${producerId}`);
+  
+          callback({ producerId });
+  
+      } catch (error) {
+          console.error('Error in produce:', error);
+          callback({ error: 'Failed to produce' });
+      }
+  });
 
     socket.on('disconnect', () => {
       console.log('Client disconnected');
